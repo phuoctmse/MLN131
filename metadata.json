@@ -1,0 +1,5 @@
+{
+  "name": "MLN131 Interactive Learning App",
+  "description": "An interactive learning platform for the Scientific Socialism course (MLN131). Students can follow presentation slides and use an AI-powered lookup to get detailed explanations of key terms, with citations from the official textbook.",
+  "requestFramePermissions": []
+}
