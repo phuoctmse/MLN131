@@ -1,11 +1,11 @@
 
 import React, { useState, useCallback } from 'react';
-import { slides } from '../data/slides';
 import Slide from './Slide';
 import SmartLookupPopup from './SmartLookupPopup';
 import { Citation } from '../types';
 import { useKeyPress } from '../hooks/useKeyPress';
 import { ChevronLeftIcon, ChevronRightIcon } from './IconComponents';
+import { slides } from '../data/slides';
 
 interface PresentationViewProps {
   onNavigateToEbook: (citation: Citation) => void;
@@ -45,6 +45,8 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook }
             </div>
         ))}
       </div>
+
+
 
       {/* Navigation Controls */}
       <button

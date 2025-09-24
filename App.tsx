@@ -18,10 +18,13 @@ const App: React.FC = () => {
     setCurrentView(View.Ebook);
   }, []);
 
+
   const handleBackToPresentation = useCallback(() => {
     setActiveCitation(null);
     setCurrentView(View.Presentation);
   }, []);
+
+
 
   return (
     <div className="w-full h-screen bg-gray-900">

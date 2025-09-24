@@ -10,6 +10,7 @@ interface SlideProps {
 
 const Slide: React.FC<SlideProps> = ({ slide, onSelectTerm }) => {
   const renderContentWithClickableTerms = (text: string) => {
+    if (!slide.keyTerms || slide.keyTerms.length === 0) return text;
     // A simple regex to find key terms in content.
     // In a real app, this might be more sophisticated.
     const keyTermsRegex = new RegExp(`(${slide.keyTerms.join('|')})`, 'gi');
@@ -42,7 +43,7 @@ const Slide: React.FC<SlideProps> = ({ slide, onSelectTerm }) => {
       <div className="mt-auto pt-8 border-t border-gray-600">
         <h4 className="text-lg font-semibold text-gray-300 mb-3">Thuật ngữ chính:</h4>
         <div className="flex flex-wrap gap-3">
-          {slide.keyTerms.map((term) => (
+          {Array.isArray(slide.keyTerms) && slide.keyTerms.length > 0 && slide.keyTerms.map((term) => (
             <button
               key={term}
               onClick={() => onSelectTerm(term)}
