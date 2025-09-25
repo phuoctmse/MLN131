@@ -8,10 +8,11 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
-        headers: {
-          'Cross-Origin-Embedder-Policy': 'require-corp',
-          'Cross-Origin-Opener-Policy': 'same-origin',
-        },
+        // Removed COEP header that was blocking CDN resources
+        // headers: {
+        //   'Cross-Origin-Embedder-Policy': 'require-corp',
+        //   'Cross-Origin-Opener-Policy': 'same-origin',
+        // },
         // Configure MIME types for worker files
         mimeTypes: {
           'application/javascript': ['js', 'mjs']

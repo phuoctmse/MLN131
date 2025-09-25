@@ -121,7 +121,7 @@ class EbookAIService {
       const heading = await this.ebookService.getHeadingById(paragraph.headingId);
       
       return {
-        source: 'Chủ nghĩa xã hội khoa học',
+        // source: 'Chủ nghĩa xã hội khoa học', // Removed as requested
         chapter: chapter ? chapter.order : 0,
         section: heading ? heading.title : 'Unknown Section',
         page: 0, // Page numbers might need to be calculated differently

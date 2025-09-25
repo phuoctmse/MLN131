@@ -23,8 +23,13 @@ const Slide: React.FC<SlideProps> = ({ slide, onSelectTerm }) => {
             key={index}
             onClick={() => onSelectTerm(part)}
             className="text-cyan-400 font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-300 rounded"
+            type="button"
+            tabIndex={0}
           >
-            {part}
+            <span className="inline-flex items-center gap-1">
+              <SparklesIcon className="w-4 h-4 inline-block" />
+              {part}
+            </span>
           </button>
         );
       }

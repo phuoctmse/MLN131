@@ -7,7 +7,7 @@ export interface SlideContent {
 }
 
 export interface Citation {
-  source: string;
+  source?: string;
   chapter: number;
   section: string;
   page: number;
@@ -17,6 +17,8 @@ export interface Citation {
 export interface TermExplanation {
   term: string;
   explanation: string;
+  interactiveQuestion?: string;
+  citationText?: string;
   citation: Citation;
 }
 
