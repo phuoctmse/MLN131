@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        headers: {
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+          'Cross-Origin-Opener-Policy': 'same-origin',
+        },
+        // Configure MIME types for worker files
+        mimeTypes: {
+          'application/javascript': ['js', 'mjs']
+        }
       },
       plugins: [react()],
       define: {
@@ -18,6 +26,13 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      assetsInclude: ['**/*.pdf'],
+      build: {
+        assetsInlineLimit: 0, // Prevent inlining of PDF files
+      },
+      optimizeDeps: {
+        include: ['pdfjs-dist']
       }
     };
 });
