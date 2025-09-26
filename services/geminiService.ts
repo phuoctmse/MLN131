@@ -109,7 +109,7 @@ const VALID_PARAGRAPH_IDS = [
 
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import { TermExplanation } from '../types';
+import { TermExplanation, BackendChatResponse } from '../types';
 
 // Initialize the Google Gemini AI client
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -138,76 +138,47 @@ export const getTermExplanation = async (term: string, followUpQuestion?: string
   console.log(`Searching for term: ${term}`);
 
   try {
-    // Load the chapter content
-    const chapterContent = await loadChapterContent();
-    
-    if (!chapterContent) {
-      console.log('No chapter content available');
-      return null;
-    }
-
-    // Check if the term exists in the content
-    if (!chapterContent.toLowerCase().includes(term.toLowerCase())) {
-      console.log(`Term "${term}" not found in chapter content`);
-      return null;
-    }
-
-    // Build a comprehensive prompt for Gemini with the full chapter context and the list of valid paragraph IDs
-    const prompt = `
-      Bạn là một chuyên gia về Chủ nghĩa xã hội khoa học. Dựa vào nội dung Chương 6 "VẤN ĐỀ DÂN TỘC VÀ TÔN GIÁO TRONG THỜI KỲ QUÁ ĐỘ LÊN CHỦ NGHĨA XÃ HỘI" sau đây:
-
-      ${chapterContent}
-
-      Danh sách tất cả các paragraphId hợp lệ trong chương này (chỉ được chọn từ danh sách này, không được tự nghĩ hoặc đoán):
-      ${VALID_PARAGRAPH_IDS.map((id) => `- ${id}`).join('\n')}
-
-      1. Hãy tóm tắt ngắn gọn ý nghĩa của thuật ngữ "${term}" (2-3 câu).
-      2. Nếu có, hãy tạo một câu hỏi tương tác ngắn để kiểm tra sự hiểu biết của người học về thuật ngữ này (ví dụ: "Bạn có thể lấy ví dụ về ...?" hoặc "Theo bạn, tại sao ... lại quan trọng trong ...?").
-      3. Chỉ trả lời dựa trên nội dung chương 6.
-      4. BẮT BUỘC phải chỉ ra đoạn trích dẫn liên quan nhất trong chương (ghi rõ paragraphId đúng với id đoạn trong danh sách trên). Nếu không xác định được đoạn cụ thể, hãy trả lời "Không thể xác định đoạn trích dẫn cụ thể trong chương 6, không thể trả lời." và KHÔNG trả lời gì thêm.
-      5. Trả về kết quả theo định dạng JSON với các trường: summary, interactiveQuestion, citationText, paragraphId.
-    `;
-
-    // Call Gemini API
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const query = followUpQuestion || term;
+    const response = await fetch('http://localhost:8000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        context_hint: null,
+      }),
     });
 
-    const aiText = response.text;
-    if (!aiText) {
-      console.error("Gemini API returned no text.");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: BackendChatResponse = await response.json();
+
+    if (data.status !== 'ok') {
       return null;
     }
 
-    // Try to parse JSON from AI response
-    let summary = '', interactiveQuestion = '', citationText = '', paragraphId = '';
-    try {
-      const match = aiText.match(/\{[\s\S]*\}/);
-      if (match) {
-        const json = JSON.parse(match[0]);
-        summary = json.summary || '';
-        interactiveQuestion = json.interactiveQuestion || '';
-        citationText = json.citationText || '';
-        paragraphId = json.paragraphId || '';
-      } else {
-        summary = aiText;
-      }
-    } catch (e) {
-      summary = aiText;
-    }
+    // Map backend response to TermExplanation
+    const citation = data.references.length > 0 ? {
+      chapter: parseInt(data.references[0].chapter) || 0,
+      section: data.references[0].headingId,
+      page: data.references[0].pIndex,
+      paragraphId: data.references[0].url,
+    } : {
+      chapter: 6,
+      section: 'Vấn đề dân tộc và tôn giáo trong thời kỳ quá độ lên chủ nghĩa xã hội',
+      page: 0,
+      paragraphId: 'chap_6275cc3e02028042',
+    };
 
     return {
       term: term,
-      explanation: summary,
-      interactiveQuestion,
-      citationText,
-      citation: {
-        chapter: 6,
-        section: 'Vấn đề dân tộc và tôn giáo trong thời kỳ quá độ lên chủ nghĩa xã hội',
-        page: 0,
-        paragraphId: paragraphId || 'chap_6275cc3e02028042',
-      },
+      explanation: data.content,
+      interactiveQuestion: data.follow_ups.length > 0 ? data.follow_ups[0].question : undefined,
+      citationText: data.note,
+      citation: citation,
     };
   } catch (error) {
     console.error("Error in getTermExplanation:", error);
@@ -216,74 +187,28 @@ export const getTermExplanation = async (term: string, followUpQuestion?: string
 };
 
 // New function to get AI-powered answers with chapter context
-export const getAIAnswerWithContext = async (question: string): Promise<{
-  summary: string;
-  interactiveQuestion: string;
-  citationText: string;
-  paragraphId: string;
-  relevanceScore: number;
-} | null> => {
-  
+export const getBackendChatResponse = async (query: string): Promise<BackendChatResponse | null> => {
   try {
-    // Load the chapter content
-    const chapterContent = await loadChapterContent();
-    
-    if (!chapterContent) {
-      console.log('No chapter content available');
-      return null;
-    }
-
-    const prompt = `
-      Bạn là một giảng viên chuyên về Chủ nghĩa xã hội khoa học. Dựa vào nội dung Chương 6 "VẤN ĐỀ DÂN TỘC VÀ TÔN GIÁO TRONG THỜI KỲ QUÁ ĐỘ LÊN CHỦ NGHĨA XÃ HỘI" sau đây:
-
-      ${chapterContent}
-
-      Danh sách tất cả các paragraphId hợp lệ trong chương này (chỉ được chọn từ danh sách này, không được tự nghĩ hoặc đoán):
-      ${VALID_PARAGRAPH_IDS.map((id) => `- ${id}`).join('\n')}
-
-      1. Hãy tóm tắt ngắn gọn câu trả lời cho câu hỏi: "${question}" (2-3 câu).
-      2. Nếu có, hãy tạo một câu hỏi tương tác ngắn để kiểm tra sự hiểu biết của người học về chủ đề này.
-      3. Chỉ trả lời dựa trên nội dung chương 6.
-      4. BẮT BUỘC phải chỉ ra đoạn trích dẫn liên quan nhất trong chương (ghi rõ paragraphId đúng với id đoạn trong danh sách trên). Nếu không xác định được đoạn cụ thể, hãy trả lời "Không thể xác định đoạn trích dẫn cụ thể trong chương 6, không thể trả lời." và KHÔNG trả lời gì thêm.
-      5. Trả về kết quả theo định dạng JSON với các trường: summary, interactiveQuestion, citationText, paragraphId.
-    `;
-
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await fetch('http://localhost:8000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        context_hint: null,
+      }),
     });
-    
-    const aiText = response.text;
-    if (!aiText) {
+
+    if (!response.ok) {
+      console.error('Backend API error:', response.statusText);
       return null;
     }
 
-    let summary = '', interactiveQuestion = '', citationText = '', paragraphId = '';
-    try {
-      const match = aiText.match(/\{[\s\S]*\}/);
-      if (match) {
-        const json = JSON.parse(match[0]);
-        summary = json.summary || '';
-        interactiveQuestion = json.interactiveQuestion || '';
-        citationText = json.citationText || '';
-        paragraphId = json.paragraphId || '';
-      } else {
-        summary = aiText;
-      }
-    } catch (e) {
-      summary = aiText;
-    }
-
-
-    return {
-      summary,
-      interactiveQuestion,
-      citationText,
-      paragraphId,
-      relevanceScore: 1.0
-    };
+    const backendResponse: BackendChatResponse = await response.json();
+    return backendResponse;
   } catch (error) {
-    console.error("Error in getAIAnswerWithContext:", error);
+    console.error("Error in getBackendChatResponse:", error);
     return null;
   }
 };

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   getTermExplanation,
-  getAIAnswerWithContext,
+  getBackendChatResponse,
 } from "../services/geminiService";
-import { TermExplanation, Citation, ChatMessage } from "../types";
-import { CloseIcon, BookOpenIcon, SparklesIcon } from "./IconComponents";
+import { TermExplanation, Citation, ChatMessage, BackendChatResponse } from "../types";
+import { CloseIcon, BookOpenIcon, SparklesIcon, UserIcon } from "./IconComponents";
 
 interface SmartLookupPopupProps {
   term: string | null;
@@ -26,6 +26,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [userQuery, setUserQuery] = useState("");
+  const [backendResponse, setBackendResponse] = useState<BackendChatResponse | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const fetchExplanation = useCallback(
@@ -34,28 +35,24 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
       setError(null);
       try {
         if (followUp) {
-          // For follow-up questions, use the comprehensive AI answer function
-          const result = await getAIAnswerWithContext(followUp);
+          // For follow-up questions, use the backend API
+          const result = await getBackendChatResponse(followUp);
           if (result) {
+            setBackendResponse(result);
             const newAiMessage: ChatMessage = {
               sender: "ai",
-              text: result.summary,
+              text: result.content,
             };
             setChatHistory((prev) => [...prev, newAiMessage]);
-            // Optionally, show interactive question as a separate message
-            if (result.interactiveQuestion) {
-              setChatHistory((prev) => [
-                ...prev,
-                { sender: "ai", text: `💡 ${result.interactiveQuestion}` },
-              ]);
+            // Optionally, show follow-ups as buttons
+            if (result.follow_ups && result.follow_ups.length > 0) {
+              // Handle follow-ups later in render
             }
           } else {
-            setError(
-              "Không tìm thấy thông tin cho câu hỏi này trong chương 6."
-            );
+            setError("Không tìm thấy thông tin cho câu hỏi này.");
             const errorMsg: ChatMessage = {
               sender: "ai",
-              text: "Xin lỗi, tôi không thể tìm thấy thông tin chi tiết trong chương 6 để trả lời câu hỏi này.",
+              text: "Xin lỗi, tôi không thể tìm thấy thông tin để trả lời câu hỏi này.",
             };
             setChatHistory((prev) => [...prev, errorMsg]);
           }
@@ -103,10 +100,12 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
   useEffect(() => {
     if (isVisible && term) {
       setChatHistory([]);
+      setBackendResponse(null);
       fetchExplanation(term);
     }
     if (!isVisible) {
       setChatHistory([]);
+      setBackendResponse(null);
     }
   }, [isVisible, term, fetchExplanation]);
 
@@ -164,15 +163,21 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                   msg.sender === "user"
                     ? "bg-blue-600 text-white"
                     : "bg-gray-700 text-gray-200"
-                }`}
+                } flex items-start gap-2`}
               >
+                {msg.sender === "ai" ? (
+                  <SparklesIcon className="w-4 h-4 mt-0.5 text-cyan-400 flex-shrink-0" />
+                ) : (
+                  <UserIcon className="w-4 h-4 mt-0.5 text-blue-300 flex-shrink-0" />
+                )}
                 <p className="text-sm">{msg.text}</p>
               </div>
             </div>
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-sm rounded-lg px-4 py-2 bg-gray-700 text-gray-200">
+              <div className="max-w-xs md:max-w-sm rounded-lg px-4 py-2 bg-gray-700 text-gray-200 flex items-start gap-2">
+                <SparklesIcon className="w-4 h-4 mt-0.5 text-cyan-400 flex-shrink-0" />
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
                   <div
@@ -193,7 +198,115 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
         {error && <p className="text-red-400 mt-4">{error}</p>}
       </div>
 
-      {explanation && !isLoading && (
+      {backendResponse && !isLoading && (
+        <div className="p-4 border-t border-gray-700 bg-gray-800/50">
+          {backendResponse.intent === 'PROJECT_META.QA' && (
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Dự án Meta QA:</p>
+              {backendResponse.references && backendResponse.references.length > 0 ? (
+                <button
+                  onClick={() => {
+                    if (onNavigateToHTMLParagraph) {
+                      onNavigateToHTMLParagraph(backendResponse.references[0].headingId);
+                    }
+                  }}
+                  className="w-full text-left p-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-start gap-3 no-underline cursor-pointer"
+                >
+                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-white">Mở Ebook tại {backendResponse.references[0].label}</p>
+                  </div>
+                </button>
+              ) : (
+                <p className="text-gray-300">Chọn đề tài để mở ebook.</p>
+              )}
+            </div>
+          )}
+          {backendResponse.intent === 'NAV.EBOOK' && (
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Điều hướng Ebook:</p>
+              {backendResponse.references && backendResponse.references.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (onNavigateToHTMLParagraph) {
+                      onNavigateToHTMLParagraph(backendResponse.references[0].headingId);
+                    }
+                  }}
+                  className="w-full text-left p-3 bg-green-600 rounded-lg hover:bg-green-500 transition-colors flex items-start gap-3 no-underline cursor-pointer"
+                >
+                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-white">Lướt đến {backendResponse.references[0].label}</p>
+                  </div>
+                </button>
+              )}
+            </div>
+          )}
+          {backendResponse.intent === 'COURSE_TERM.CH6' && (
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Thuật ngữ khóa học:</p>
+              <p className="text-gray-300 mb-2">{backendResponse.content}</p>
+              {backendResponse.references && backendResponse.references.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (onNavigateToHTMLParagraph) {
+                      onNavigateToHTMLParagraph(backendResponse.references[0].headingId);
+                    }
+                  }}
+                  className="w-full text-left p-3 bg-purple-600 rounded-lg hover:bg-purple-500 transition-colors flex items-start gap-3 no-underline cursor-pointer"
+                >
+                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-white">Xem trong Ebook</p>
+                  </div>
+                </button>
+              )}
+            </div>
+          )}
+          {backendResponse.intent === 'WEB.SEARCH' && (
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Kết quả tìm kiếm web:</p>
+              {backendResponse.references && backendResponse.references.map((ref, index) => (
+                <a
+                  key={index}
+                  href={ref.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors mb-2"
+                >
+                  <p className="text-white font-semibold">{ref.label}</p>
+                  <p className="text-gray-300 text-sm">{ref.url}</p>
+                </a>
+              ))}
+            </div>
+          )}
+          {backendResponse.intent === 'SMALL_TALK' && (
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Trò chuyện:</p>
+              <p className="text-gray-300 mb-2">{backendResponse.content}</p>
+              {backendResponse.follow_ups && backendResponse.follow_ups.length > 0 && (
+                <div className="space-y-2">
+                  {backendResponse.follow_ups.map((followUp, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        const newHumanMessage: ChatMessage = { sender: "user", text: followUp.question };
+                        setChatHistory((prev) => [...prev, newHumanMessage]);
+                        fetchExplanation("", followUp.question);
+                      }}
+                      className="w-full text-left p-2 bg-cyan-600 rounded hover:bg-cyan-500 transition-colors text-white"
+                    >
+                      {followUp.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {explanation && !backendResponse && !isLoading && (
         <div className="p-4 border-t border-gray-700 bg-gray-800/50">
           <p className="text-sm text-gray-400 mb-2">Nguồn trích dẫn:</p>
           <div className="flex flex-col gap-2">
@@ -230,6 +343,39 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
       )}
 
       <div className="p-4 border-t border-gray-700">
+        <p className="text-sm text-gray-400 mb-2">Ví dụ câu hỏi:</p>
+        <div className="grid grid-cols-1 gap-2 mb-4">
+          <button
+            onClick={() => setUserQuery("Hai xu hướng khách quan…")}
+            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+          >
+            Hai xu hướng khách quan…
+          </button>
+          <button
+            onClick={() => setUserQuery("Mở mục 6.2.1 trong ebook")}
+            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+          >
+            Mở mục 6.2.1 trong ebook
+          </button>
+          <button
+            onClick={() => setUserQuery("Ai phụ trách Frontend?")}
+            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+          >
+            Ai phụ trách Frontend?
+          </button>
+          <button
+            onClick={() => setUserQuery("Hoàng Sa Trường Sa là của ai?")}
+            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+          >
+            Hoàng Sa Trường Sa là của ai?
+          </button>
+          <button
+            onClick={() => setUserQuery("giải thích giúp?")}
+            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+          >
+            giải thích giúp?
+          </button>
+        </div>
         <form onSubmit={handleFollowUpSubmit}>
           <input
             type="text"

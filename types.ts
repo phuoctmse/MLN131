@@ -1,4 +1,3 @@
-
 export interface SlideContent {
   id: number;
   title: string;
@@ -76,4 +75,22 @@ export interface SearchIndex {
   chapterMap: Map<string, EbookChapter>;
   headingMap: Map<string, EbookHeading>;
   termIndex: Map<string, string[]>; // term -> paragraph IDs
+}
+
+export interface BackendChatResponse {
+  intent: string;
+  content: string;
+  status: string;
+  references: Array<{
+    label: string;
+    chapter: string;
+    headingId: string;
+    pIndex: number;
+    url: string;
+  }>;
+  follow_ups: Array<{
+    label: string;
+    question: string;
+  }>;
+  note: string;
 }
