@@ -94,17 +94,17 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
   }
 
   return (
-    <div className="w-full h-screen bg-gray-100 flex flex-col">
+    <div className="w-full h-screen bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-800 text-white px-4 py-3 flex items-center gap-4 shadow-lg">
+      <div className="bg-gradient-to-r from-red-800 via-yellow-200 to-red-700 text-yellow-100 px-4 py-3 flex items-center gap-4 shadow-lg border-b-4 border-yellow-400">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-red-700 hover:bg-yellow-400 hover:text-red-900 rounded-lg transition-colors border border-yellow-400 font-semibold"
         >
           <ArrowLeftIcon className="w-4 h-4" />
           Quay lại
         </button>
-        <h1 className="text-lg font-semibold">Chương 6: Vấn đề dân tộc và tôn giáo trong thời kỳ quá độ lên chủ nghĩa xã hội</h1>
+        <h1 className="text-lg font-semibold text-yellow-100 drop-shadow">Chương 6: Vấn đề dân tộc và tôn giáo trong thời kỳ quá độ lên chủ nghĩa xã hội</h1>
       </div>
 
       {/* Content */}
@@ -118,7 +118,7 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
 
       {/* Floating Chat Button */}
       <button
-        className="fixed bottom-8 right-8 z-50 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full shadow-lg p-4 flex items-center gap-2 transition-colors"
+        className="fixed bottom-8 right-8 z-50 bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 hover:from-yellow-400 hover:via-red-700 hover:to-yellow-200 text-yellow-100 hover:text-red-900 border-4 border-yellow-400 rounded-full shadow-lg p-4 flex items-center gap-2 transition-colors font-semibold drop-shadow-lg"
         title="Mở chat AI hỗ trợ"
         onClick={() => onOpenChat && onOpenChat()}
       >
@@ -130,37 +130,39 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
 
       {/* Custom Styles */}
       <style jsx>{`
+
         .ebook-content {
           font-family: 'Segoe UI', 'Arial', 'Tahoma', 'DejaVu Sans', 'Liberation Sans', 'Noto Sans', 'Roboto', 'Helvetica Neue', 'sans-serif';
           line-height: 1.8;
-          color: #333;
+          color: #222;
         }
 
         .ebook-content h1 {
-          color: #1e40af;
+          color: #b91c1c;
           font-size: 2rem;
           font-weight: bold;
           margin: 2rem 0 1.5rem 0;
           padding-bottom: 0.5rem;
-          border-bottom: 2px solid #e5e7eb;
+          border-bottom: 2px solid #f59e0b;
+          text-shadow: 1px 1px 2px #fde68a;
         }
 
         .ebook-content h2 {
-          color: #1e3a8a;
+          color: #f59e0b;
           font-size: 1.5rem;
           font-weight: 600;
           margin: 1.5rem 0 1rem 0;
         }
 
         .ebook-content h3 {
-          color: #1e3a8a;
+          color: #f59e0b;
           font-size: 1.25rem;
           font-weight: 600;
           margin: 1.25rem 0 0.75rem 0;
         }
 
         .ebook-content h4 {
-          color: #374151;
+          color: #b91c1c;
           font-size: 1.125rem;
           font-weight: 600;
           margin: 1rem 0 0.5rem 0;
@@ -211,10 +213,10 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
         }
 
         .ebook-content blockquote {
-          border-left: 4px solid #6b7280;
+          border-left: 4px solid #b91c1c;
           margin: 1.5rem 0;
           padding: 1rem 1.5rem;
-          background-color: #f9fafb;
+          background-color: #fef9c3;
           font-style: italic;
         }
 
@@ -225,13 +227,13 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
         }
 
         .ebook-content th, .ebook-content td {
-          border: 1px solid #d1d5db;
+          border: 1px solid #f59e0b;
           padding: 0.75rem;
           text-align: left;
         }
 
         .ebook-content th {
-          background-color: #f3f4f6;
+          background-color: #fde68a;
           font-weight: 600;
         }
       `}</style>

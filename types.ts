@@ -1,8 +1,14 @@
 export interface SlideContent {
   id: number;
   title: string;
-  content: string[];
-  keyTerms: string[];
+  content: Array<string | SlidePoint>;
+  icon?: string;
+}
+
+export interface SlidePoint {
+  text: string;
+  highlight?: boolean;
+  subPoints?: string[];
 }
 
 export interface Citation {

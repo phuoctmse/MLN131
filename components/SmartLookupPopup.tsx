@@ -143,15 +143,15 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
 
   return (
     <div
-      className={`fixed top-0 right-0 h-full w-full md:w-1/3 xl:w-1/4 bg-slate-800/95 border-l border-slate-600 shadow-2xl transform transition-transform duration-300 ease-in-out backdrop-blur-md ${
+  className={`fixed top-0 right-0 h-full w-full md:w-1/3 xl:w-1/4 bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 border-l-4 border-yellow-400 shadow-2xl transform transition-transform duration-300 ease-in-out ${
         isVisible
           ? "translate-x-0"
           : "translate-x-full pointer-events-none opacity-0"
       } flex flex-col`}
       style={{ zIndex: 1000 }}
     >
-      <div className="p-4 border-b border-slate-600 flex justify-between items-center bg-slate-700">
-        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+      <div className="p-4 border-b-4 border-yellow-400 flex justify-between items-center bg-gradient-to-r from-red-800 via-yellow-200 to-red-700">
+  <h3 className="text-xl font-bold text-yellow-300 flex items-center gap-2">
           <SparklesIcon className="w-6 h-6 text-cyan-400" />
           Tra cứu thông minh
         </h3>
@@ -164,7 +164,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
       </div>
 
       <div className="flex-grow p-4 overflow-y-auto">
-        <h4 className="text-2xl font-semibold text-cyan-400 mb-4">
+  <h4 className="text-2xl font-semibold text-yellow-400 mb-4">
           {explanation?.term || term}
         </h4>
 
@@ -176,34 +176,39 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                 msg.sender === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <div
-                className={`max-w-xs md:max-w-sm rounded-lg px-4 py-2 ${
-                  msg.sender === "user"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-600 text-gray-200"
-                } flex items-start gap-2`}
-              >
-                {msg.sender === "ai" ? (
-                  <SparklesIcon className="w-4 h-4 mt-0.5 text-cyan-400 flex-shrink-0" />
-                ) : (
-                  <UserIcon className="w-4 h-4 mt-0.5 text-blue-300 flex-shrink-0" />
-                )}
-                <p className="text-sm">{msg.text}</p>
-              </div>
+                <div
+                  className={`max-w-xs md:max-w-sm rounded-lg px-4 py-2 ${
+                    msg.sender === "user"
+                      ? "bg-red-700/90 text-yellow-100 border border-yellow-400"
+                      : "bg-yellow-100 text-red-900 border border-yellow-400"
+                  } flex items-start gap-2`}
+                >
+                  {msg.sender === "user" ? (
+                    <>
+                      <p className={`text-sm flex-grow ${msg.sender === "ai" ? "leading-relaxed" : ""}`}>{msg.text}</p>
+                      <UserIcon className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
+                    </>
+                  ) : (
+                    <>
+                      <SparklesIcon className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
+                      <p className="text-sm leading-relaxed flex-grow whitespace-pre-line">{msg.text}</p>
+                    </>
+                  )}
+                </div>
             </div>
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-sm rounded-lg px-4 py-2 bg-slate-600 text-gray-200 flex items-start gap-2">
-                <SparklesIcon className="w-4 h-4 mt-0.5 text-cyan-400 flex-shrink-0" />
+              <div className="max-w-xs md:max-w-sm rounded-lg px-4 py-2 bg-yellow-100 text-red-900 border border-yellow-400 flex items-start gap-2">
+                <SparklesIcon className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                   <div
-                    className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"
+                    className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
                     style={{ animationDelay: "0.2s" }}
                   ></div>
                   <div
-                    className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"
+                    className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
                     style={{ animationDelay: "0.4s" }}
                   ></div>
                 </div>
@@ -220,7 +225,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
         <div className="p-4 border-t border-slate-600 bg-slate-700/50">
           {backendResponse.intent === 'PROJECT_META_QA' && (
             <div>
-              <p className="text-sm text-gray-400 mb-2">Dự án Meta QA:</p>
+              <p className="text-sm text-yellow-400 mb-2">Dự án Meta QA:</p>
               {backendResponse.references && backendResponse.references.length > 0 ? (
                 <button
                   onClick={() => {
@@ -231,19 +236,19 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                   }}
                   className="w-full text-left p-3 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors flex items-start gap-3 no-underline cursor-pointer"
                 >
-                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
+                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-white">Mở Ebook tại {referenceTitles.get(backendResponse.references[0].headingId) || backendResponse.references[0].label}</p>
+                    <p className="font-semibold text-red-900">Mở Ebook tại {referenceTitles.get(backendResponse.references[0].headingId) || backendResponse.references[0].label}</p>
                   </div>
                 </button>
               ) : (
-                <p className="text-gray-300">Chọn đề tài để mở ebook.</p>
+                <p className="text-yellow-700">Chọn đề tài để mở ebook.</p>
               )}
             </div>
           )}
           {backendResponse.intent === 'NAV_EBOOK' && (
             <div>
-              <p className="text-sm text-gray-400 mb-2">Điều hướng Ebook:</p>
+              <p className="text-sm text-yellow-400 mb-2">Điều hướng Ebook:</p>
               {backendResponse.references && backendResponse.references.length > 0 && (
                 <button
                   onClick={() => {
@@ -254,9 +259,9 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                   }}
                   className="w-full text-left p-3 bg-green-600 rounded-lg hover:bg-green-500 transition-colors flex items-start gap-3 no-underline cursor-pointer"
                 >
-                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
+                  <BookOpenIcon className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-white">Lướt đến {referenceTitles.get(backendResponse.references[0].headingId) || backendResponse.references[0].label}</p>
+                    <p className="font-semibold text-red-900">Lướt đến {referenceTitles.get(backendResponse.references[0].headingId) || backendResponse.references[0].label}</p>
                   </div>
                 </button>
               )}
@@ -264,8 +269,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
           )}
           {backendResponse.intent === 'COURSE_TERM_CH6' && (
             <div>
-              <p className="text-sm text-gray-400 mb-2">Thuật ngữ khóa học:</p>
-              <p className="text-gray-300 mb-2">{backendResponse.content}</p>
+              <p className="text-sm text-yellow-400 mb-2">Thuật ngữ khóa học:</p>
               {backendResponse.references && backendResponse.references.length > 0 && (
                 <div className="space-y-2">
                   {backendResponse.references.map((ref, index) => (
@@ -277,7 +281,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                           onNavigateToHTMLParagraph(paragraphId);
                         }
                       }}
-                      className="w-full text-left p-2 bg-purple-600 rounded hover:bg-purple-500 transition-colors text-white"
+                      className="w-full text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900"
                     >
                       Xem trong ebook: {referenceTitles.get(ref.headingId) || ref.label}
                     </button>
@@ -288,7 +292,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
           )}
           {backendResponse.intent === 'WEB_SEARCH' && (
             <div>
-              <p className="text-sm text-gray-400 mb-2">Kết quả tìm kiếm web:</p>
+              <p className="text-sm text-yellow-400 mb-2">Kết quả tìm kiếm web:</p>
               {backendResponse.references && backendResponse.references.map((ref, index) => (
                 <a
                   key={index}
@@ -297,16 +301,15 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                   rel="noopener noreferrer"
                   className="block p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors mb-2"
                 >
-                  <p className="text-white font-semibold">{ref.label}</p>
-                  <p className="text-gray-300 text-sm">{ref.url}</p>
+                  <p className="text-yellow-400 font-semibold">{ref.label}</p>
+                  <p className="text-yellow-700 text-sm">{ref.url}</p>
                 </a>
               ))}
             </div>
           )}
           {backendResponse.intent === 'SMALL_TALK' && (
             <div>
-              <p className="text-sm text-gray-400 mb-2">Trò chuyện:</p>
-              <p className="text-gray-300 mb-2">{backendResponse.content}</p>
+              <p className="text-sm text-yellow-400 mb-2">Trò chuyện:</p>
               {backendResponse.follow_ups && backendResponse.follow_ups.length > 0 && (
                 <div className="space-y-2">
                   {backendResponse.follow_ups.map((followUp, index) => (
@@ -317,7 +320,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                         setChatHistory((prev) => [...prev, newHumanMessage]);
                         fetchExplanation("", followUp.question);
                       }}
-                      className="w-full text-left p-2 bg-cyan-600 rounded hover:bg-cyan-500 transition-colors text-white"
+                      className="w-full text-left p-2 bg-yellow-400 rounded hover:bg-red-700 transition-colors text-red-900 hover:text-yellow-100"
                     >
                       {followUp.label}
                     </button>
@@ -331,11 +334,11 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
 
       {explanation && !backendResponse && !isLoading && (
         <div className="p-4 border-t border-slate-600 bg-slate-700/50">
-          <p className="text-sm text-gray-400 mb-2">Nguồn trích dẫn:</p>
+          <p className="text-sm text-yellow-400 mb-2">Nguồn trích dẫn:</p>
           <div className="flex flex-col gap-2">
             {explanation.citationText && (
-              <div className="bg-slate-800 text-gray-100 p-2 rounded mb-2 text-sm border-l-4 border-cyan-400">
-                <span className="font-semibold text-cyan-300">Trích dẫn:</span>{" "}
+              <div className="bg-red-900 text-yellow-100 p-2 rounded mb-2 text-sm border-l-4 border-yellow-400">
+                <span className="font-semibold text-yellow-400">Trích dẫn:</span>{" "}
                 {explanation.citationText}
               </div>
             )}
@@ -352,7 +355,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
               >
                 <BookOpenIcon className="w-5 h-5 mt-0.5 text-white flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">
+                  <p className="font-semibold text-yellow-100">
                     Xem đoạn trong giáo trình HTML
                   </p>
                   <p className="text-sm text-yellow-100">
@@ -366,35 +369,35 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
       )}
 
       <div className="p-4 border-t border-slate-600">
-        <p className="text-sm text-gray-400 mb-2">Ví dụ câu hỏi:</p>
+  <p className="text-sm text-yellow-400 mb-2">Ví dụ câu hỏi:</p>
         <div className="grid grid-cols-1 gap-2 mb-4">
           <button
             onClick={() => setUserQuery("Hai xu hướng khách quan…")}
-            className="text-left p-2 bg-slate-600 rounded hover:bg-slate-500 transition-all duration-200 hover:scale-105 text-white text-sm border border-slate-500"
+            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-all duration-200 hover:scale-105 text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
           >
             Hai xu hướng khách quan…
           </button>
           <button
             onClick={() => setUserQuery("Mở mục 6.2.1 trong ebook")}
-            className="text-left p-2 bg-slate-600 rounded hover:bg-slate-500 transition-colors text-white text-sm border border-slate-500"
+            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
           >
             Mở mục 6.2.1 trong ebook
           </button>
           <button
             onClick={() => setUserQuery("Ai phụ trách Frontend?")}
-            className="text-left p-2 bg-slate-600 rounded hover:bg-slate-500 transition-colors text-white text-sm border border-slate-500"
+            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
           >
             Ai phụ trách Frontend?
           </button>
           <button
             onClick={() => setUserQuery("Hoàng Sa Trường Sa là của ai?")}
-            className="text-left p-2 bg-slate-600 rounded hover:bg-slate-500 transition-colors text-white text-sm border border-slate-500"
+            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
           >
             Hoàng Sa Trường Sa là của ai?
           </button>
           <button
             onClick={() => setUserQuery("giải thích giúp?")}
-            className="text-left p-2 bg-cyan-700 rounded hover:bg-cyan-600 transition-colors text-white text-sm border border-cyan-500"
+            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
           >
             giải thích giúp?
           </button>
@@ -405,7 +408,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
             value={userQuery}
             onChange={(e) => setUserQuery(e.target.value)}
             placeholder="Nhập câu hỏi hoặc thuật ngữ cần tra cứu..."
-            className="w-full bg-slate-600 border border-slate-500 rounded-md px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full bg-yellow-100 border border-yellow-400 rounded-md px-3 py-2 text-red-900 placeholder-yellow-700 focus:outline-none focus:ring-2 focus:ring-red-700"
             disabled={isLoading}
           />
         </form>

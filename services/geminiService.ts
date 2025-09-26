@@ -236,6 +236,50 @@ export const getTermExplanation = async (term: string, followUpQuestion?: string
 
 // New function to get AI-powered answers with chapter context
 export const getBackendChatResponse = async (query: string): Promise<BackendChatResponse | null> => {
+  // Mock response for testing
+  if (query.includes("Hai xu hướng khách quan") || query.includes("dân tộc") || query.includes("tôn giáo")) {
+    return {
+      status: "ok",
+      intent: "COURSE_TERM_CH6",
+      content: "Chào bạn, mình xin giải thích về vấn đề dân tộc và tôn giáo ở Việt Nam dựa trên ngữ cảnh bạn cung cấp nhé. \n\nTrong bối cảnh thế giới có xu hướng xung đột dân tộc, tôn giáo, Việt Nam, ngoại trừ giai đoạn bị Pháp và Mỹ lợi dụng tôn giáo, nhìn chung đã giải quyết mối quan hệ dân tộc và tôn giáo khá tốt dưới sự lãnh đạo của Đảng Cộng sản Việt Nam. Tuy nhiên, vẫn có những mâu thuẫn cần nhận diện và giải quyết khách quan để phát huy các giá trị tốt đẹp, góp phần làm phong phú văn hóa Việt Nam và đảm bảo ổn định chính trị quốc gia.\n\nĐể giải quyết tốt mối quan hệ này, cần tuân thủ nguyên tắc đặt trong mối quan hệ với cộng đồng quốc gia – dân tộc thống nhất theo định hướng xã hội chủ nghĩa, đảm bảo quyền tự do tín ngưỡng, tôn giáo và quyền của các dân tộc thiểu số. Đồng thời, phải kiên quyết đấu tranh chống việc lợi dụng vấn đề dân tộc, tôn giáo vào mục đích chính trị, đặc biệt là âm mưu \"diễn biến hòa bình\" của các thế lực thù địch, nhất là ở các khu vực trọng điểm như Tây Bắc, Tây Nguyên, Tây Nam Bộ và Tây duyên hải miền Trung.",
+      references: [
+        {
+          label: "Ch6 • head_94548… • p2",
+          chapter: "6",
+          headingId: "head_945489d75df40749",
+          pIndex: 2,
+          url: "ebook_chapter_chap_4b6b984589dd283e.html"
+        },
+        {
+          label: "Ch6 • head_185b7… • p4",
+          chapter: "6",
+          headingId: "head_185b750c16e142f4",
+          pIndex: 4,
+          url: "ebook_chapter_chap_4b6b984589dd283e.html"
+        },
+        {
+          label: "Ch6 • head_185b7… • p5",
+          chapter: "6",
+          headingId: "head_185b750c16e142f4",
+          pIndex: 5,
+          url: "ebook_chapter_chap_4b6b984589dd283e.html"
+        }
+      ],
+      follow_ups: [
+        {
+          label: "Những giá trị tốt đẹp của dân tộc và tôn giáo được phát huy như thế nào?",
+          question: "Những giá trị tốt đẹp của dân tộc và tôn giáo được phát huy như thế nào?"
+        },
+        {
+          label: "Các thế lực thù địch thường lợi dụng vấn đề dân tộc và tôn giáo như thế nào?",
+          question: "Các thế lực thù địch thường lợi dụng vấn đề dân tộc và tôn giáo như thế nào?"
+        }
+      ],
+      note: "Nguồn: trích dẫn trực tiếp từ Chapter 6"
+    };
+  }
+
+  // For other queries, try to call real backend
   try {
     const response = await fetch('http://localhost:8000/chat', {
       method: 'POST',
