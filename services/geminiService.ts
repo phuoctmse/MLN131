@@ -111,8 +111,56 @@ const VALID_PARAGRAPH_IDS = [
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { TermExplanation, BackendChatResponse } from '../types';
 
-// Initialize the Google Gemini AI client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Ebook TOC types
+interface EbookHeading {
+  headingId: string;
+  title: string;
+  order: number;
+}
+
+interface EbookChapter {
+  chapterId: string;
+  title: string;
+  order: number;
+  headings: EbookHeading[];
+}
+
+interface EbookTOC {
+  chapters: EbookChapter[];
+}
+
+// Load ebook TOC
+let ebookTOC: EbookTOC | null = null;
+
+const loadEbookTOC = async (): Promise<EbookTOC> => {
+  if (ebookTOC) return ebookTOC;
+  
+  try {
+    const response = await fetch('/data/ebook_toc.json');
+    ebookTOC = await response.json();
+    return ebookTOC;
+  } catch (error) {
+    console.error('Error loading ebook TOC:', error);
+    return { chapters: [] };
+  }
+};
+
+// Get heading title by headingId
+export const getHeadingTitle = async (headingId: string): Promise<string> => {
+  const toc = await loadEbookTOC();
+  for (const chapter of toc.chapters) {
+    const heading = chapter.headings.find(h => h.headingId === headingId);
+    if (heading) {
+      return heading.title;
+    }
+  }
+  return headingId; // fallback
+};
+
+// Create paragraph ID from headingId and pIndex
+export const createParagraphId = (headingId: string, pIndex: number): string => {
+  return `${headingId}_p${pIndex}`;
+};
 
 // Load content from the specific chapter file
 const loadChapterContent = async (): Promise<string> => {

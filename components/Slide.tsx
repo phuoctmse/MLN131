@@ -38,21 +38,29 @@ const Slide: React.FC<SlideProps> = ({ slide, onSelectTerm }) => {
   };
 
   return (
-    <div className="w-full h-full p-8 md:p-16 flex flex-col justify-center bg-gray-800 text-white rounded-lg shadow-2xl">
-      <h2 className="text-4xl md:text-5xl font-bold text-cyan-400 mb-8">{slide.title}</h2>
+    <div className="w-full h-full p-8 md:p-16 flex flex-col justify-center bg-gradient-to-br from-gray-800 via-slate-800 to-gray-900 text-white rounded-lg shadow-2xl relative overflow-hidden">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-cyan-400 rounded-full animate-pulse"></div>
+        <div className="absolute top-32 right-20 w-16 h-16 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
+      <h2 className="text-4xl md:text-5xl font-bold text-cyan-400 mb-8 animate-fade-in-up">{slide.title}</h2>
       <ul className="space-y-4 text-xl md:text-2xl list-disc list-inside">
         {slide.content.map((point, index) => (
-          <li key={index}>{renderContentWithClickableTerms(point)}</li>
+          <li key={index} className="animate-fade-in-left" style={{ animationDelay: `${index * 0.2}s` }}>{renderContentWithClickableTerms(point)}</li>
         ))}
       </ul>
-      <div className="mt-auto pt-8 border-t border-gray-600">
+      <div className="mt-auto pt-8 border-t border-gray-600 animate-fade-in-up" style={{ animationDelay: '1s' }}>
         <h4 className="text-lg font-semibold text-gray-300 mb-3">Thuật ngữ chính:</h4>
         <div className="flex flex-wrap gap-3">
-          {Array.isArray(slide.keyTerms) && slide.keyTerms.length > 0 && slide.keyTerms.map((term) => (
+          {Array.isArray(slide.keyTerms) && slide.keyTerms.length > 0 && slide.keyTerms.map((term, index) => (
             <button
               key={term}
               onClick={() => onSelectTerm(term)}
-              className="px-4 py-2 bg-gray-700 text-cyan-300 rounded-full hover:bg-cyan-900 hover:text-white transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gray-700 text-cyan-300 rounded-full hover:bg-cyan-900 hover:text-white transition-all duration-300 hover:scale-110 flex items-center gap-2 animate-fade-in-scale"
+              style={{ animationDelay: `${1.5 + index * 0.1}s` }}
             >
               <SparklesIcon className="w-5 h-5" />
               {term}
