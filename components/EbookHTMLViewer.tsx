@@ -26,7 +26,7 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
   const loadHTMLContent = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/data/ebook_chapter_chap_6275cc3e02028042.html');
+      const response = await fetch('/data/ebook_chapter_chap_4b6b984589dd283e.html');
       if (!response.ok) {
         throw new Error('Failed to load ebook content');
       }
