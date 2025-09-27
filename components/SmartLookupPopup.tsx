@@ -143,14 +143,14 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
 
   return (
     <div
-  className={`fixed top-0 right-0 h-full w-full md:w-1/3 xl:w-1/4 bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 border-l-4 border-yellow-400 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+  className={`fixed top-0 right-0 h-full w-full md:w-1/3 xl:w-1/4 bg-gradient-to-br from-red-900 via-red-800 to-yellow-800 border-l-4 border-yellow-400 shadow-2xl transform transition-transform duration-300 ease-in-out ${
         isVisible
           ? "translate-x-0"
           : "translate-x-full pointer-events-none opacity-0"
       } flex flex-col`}
       style={{ zIndex: 1000 }}
     >
-      <div className="p-4 border-b-4 border-yellow-400 flex justify-between items-center bg-gradient-to-r from-red-800 via-yellow-200 to-red-700">
+      <div className="p-4 border-b-4 border-yellow-400 flex justify-between items-center bg-gradient-to-r from-red-900 via-red-800 to-yellow-800">
   <h3 className="text-xl font-bold text-yellow-300 flex items-center gap-2">
           <SparklesIcon className="w-6 h-6 text-cyan-400" />
           Tra cứu thông minh

@@ -46,7 +46,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
   }, [onOpenChat]);
 
   return (
-  <div className="relative w-full h-full flex flex-col items-center justify-center p-4 md:p-8 pt-20 overflow-hidden bg-gradient-to-br from-red-700 via-yellow-100 to-red-900">
+  <div className="relative w-full h-full flex flex-col items-center justify-center p-4 md:p-8 pt-20 overflow-hidden bg-gradient-to-br from-red-900 via-red-800 to-yellow-800">
       {/* Nav with logo/slogan */}
   <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-2 bg-red-800/90 border-b-2 border-yellow-400 shadow-lg">
         <div className="flex items-center gap-2">

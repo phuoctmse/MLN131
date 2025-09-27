@@ -94,9 +94,9 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
   }
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 flex flex-col">
+    <div className="w-full h-screen bg-gradient-to-br from-red-900 via-red-800 to-yellow-800 flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-800 via-yellow-200 to-red-700 text-yellow-100 px-4 py-3 flex items-center gap-4 shadow-lg border-b-4 border-yellow-400">
+      <div className="bg-gradient-to-r from-red-900 via-red-800 to-yellow-800 text-yellow-100 px-4 py-3 flex items-center gap-4 shadow-lg border-b-4 border-yellow-400">
         <button
           onClick={onBack}
           className="flex items-center gap-2 px-3 py-2 bg-red-700 hover:bg-yellow-400 hover:text-red-900 rounded-lg transition-colors border border-yellow-400 font-semibold"
@@ -111,14 +111,14 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
       <div className="flex-1 overflow-auto">
         <div 
           ref={containerRef}
-          className="ebook-content max-w-4xl mx-auto py-8 px-6"
+          className="ebook-content max-w-4xl mx-auto py-8 px-6 bg-[#fff8e1] rounded-xl shadow-lg"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       </div>
 
       {/* Floating Chat Button */}
       <button
-        className="fixed bottom-8 right-8 z-50 bg-gradient-to-br from-red-800 via-yellow-200 to-red-700 hover:from-yellow-400 hover:via-red-700 hover:to-yellow-200 text-yellow-100 hover:text-red-900 border-4 border-yellow-400 rounded-full shadow-lg p-4 flex items-center gap-2 transition-colors font-semibold drop-shadow-lg"
+        className="fixed bottom-8 right-8 z-50 bg-gradient-to-br from-red-800 via-red-900 to-yellow-800 hover:from-yellow-600 hover:via-red-800 hover:to-yellow-600 text-yellow-100 hover:text-red-900 border-4 border-yellow-400 rounded-full shadow-lg p-4 flex items-center gap-2 transition-colors font-semibold drop-shadow-lg"
         title="Mở chat AI hỗ trợ"
         onClick={() => onOpenChat && onOpenChat()}
       >
@@ -174,14 +174,15 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
           text-indent: 2rem;
         }
 
+
         .ebook-content .hl {
-          background-color: #fef3c7;
+          background-color: #f3f4f6;
           padding: 0.125rem 0.25rem;
           border-radius: 0.25rem;
         }
 
         .ai-highlight {
-          background-color: #fcd34d !important;
+          background-color: #fde68a !important;
           padding: 0.5rem !important;
           border-radius: 0.5rem !important;
           border-left: 4px solid #f59e0b !important;
@@ -190,7 +191,7 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
 
         @keyframes highlight-pulse {
           0% { 
-            background-color: #fcd34d;
+            background-color: #fde68a;
             transform: scale(1);
           }
           50% { 
@@ -198,7 +199,7 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
             transform: scale(1.02);
           }
           100% { 
-            background-color: #fcd34d;
+            background-color: #fde68a;
             transform: scale(1);
           }
         }
@@ -216,7 +217,7 @@ const EbookHTMLViewer: React.FC<EbookHTMLViewerProps> = ({ onBack, highlightPara
           border-left: 4px solid #b91c1c;
           margin: 1.5rem 0;
           padding: 1rem 1.5rem;
-          background-color: #fef9c3;
+          background-color: #f3f4f6;
           font-style: italic;
         }
 

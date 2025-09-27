@@ -25,30 +25,30 @@ const Slide: React.FC<SlideProps> = ({ slide, onSelectTerm }) => {
           {slide.icon && (
             <div dangerouslySetInnerHTML={{ __html: slide.icon }} style={{ color: '#06b6d1' }} />
           )}
-          <h2 className="text-4xl md:text-5xl font-bold text-yellow-400 drop-shadow-lg">{slide.title}</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-2xl">{slide.title}</h2>
         </div>
         <div className="mt-2 text-xl md:text-2xl font-bold text-yellow-400 bg-red-600/90 px-6 py-2 rounded-full shadow animate-fade-in-up border-2 border-yellow-400">
           Đoàn kết – Đa dạng – Một Việt Nam
         </div>
       </div>
-      <div className="space-y-8 text-xl md:text-2xl text-yellow-200">
+      <div className="space-y-8 text-xl md:text-2xl text-white">
         {slide.content.map((point, index) => {
           if (typeof point === 'string') {
             return (
-              <div key={index} className="animate-fade-in-left font-bold text-2xl md:text-3xl text-yellow-200 drop-shadow-lg mb-2" style={{ animationDelay: `${index * 0.2}s` }}>
+              <div key={index} className="animate-fade-in-left font-bold text-2xl md:text-3xl text-white drop-shadow-2xl mb-2" style={{ animationDelay: `${index * 0.2}s` }}>
                 {renderContentPlain(point)}
               </div>
             );
           } else if (typeof point === 'object' && point !== null && 'text' in point) {
             return (
               <div key={index} className="animate-fade-in-left mb-6" style={{ animationDelay: `${index * 0.2}s` }}>
-                <div className={`font-extrabold text-2xl md:text-3xl py-2 px-4 rounded-lg inline-block text-yellow-300 border-b-4 border-yellow-400 shadow-md mb-2 ${point.highlight ? 'animate-pulse' : ''}`}>{renderContentPlain(point.text)}</div>
+                <div className={`font-extrabold text-2xl md:text-3xl py-2 px-4 rounded-lg inline-block text-red-900 bg-yellow-100/90 border-b-4 border-red-600 shadow-md mb-2 ${point.highlight ? 'animate-pulse' : ''}`}>{renderContentPlain(point.text)}</div>
                 {Array.isArray(point.subPoints) && point.subPoints.length > 0 && (
                   <div className="flex flex-wrap gap-3 mt-3">
                     {point.subPoints.map((sub, subIdx) => (
                       <button
                         key={subIdx}
-                        className="inline-block bg-red-700/80 text-yellow-200 px-4 py-2 rounded-full shadow hover:bg-yellow-500/80 hover:text-red-900 transition-all duration-300 animate-fade-in-scale text-lg md:text-xl focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="inline-block bg-red-700/90 text-white px-4 py-2 rounded-full shadow hover:bg-yellow-500/90 hover:text-red-900 transition-all duration-300 animate-fade-in-scale text-lg md:text-xl focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         onClick={() => onSelectTerm(sub)}
                         type="button"
                       >
