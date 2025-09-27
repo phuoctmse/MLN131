@@ -30,6 +30,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
   const [userQuery, setUserQuery] = useState("");
   const [backendResponse, setBackendResponse] = useState<BackendChatResponse | null>(null);
   const [referenceTitles, setReferenceTitles] = useState<Map<string, string>>(new Map());
+  const [citationTexts, setCitationTexts] = useState<Map<string, string>>(new Map());
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const fetchExplanation = useCallback(
@@ -51,7 +52,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
             if (result.follow_ups && result.follow_ups.length > 0) {
               const followUpMessage: ChatMessage = {
                 sender: "ai",
-                text: "📋 Câu hỏi gợi ý:",
+                text: "Câu hỏi gợi ý:",
                 followUps: result.follow_ups
               };
               setChatHistory((prev) => [...prev, followUpMessage]);
@@ -121,18 +122,40 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory, isLoading]);
 
-  // Load reference titles when backendResponse changes
+  // Load reference titles and citation texts when backendResponse changes
   useEffect(() => {
     if (backendResponse?.references) {
-      const loadTitles = async () => {
+      const loadTitlesAndCitations = async () => {
         const titles = new Map<string, string>();
+        const citations = new Map<string, string>();
+        
         for (const ref of backendResponse.references) {
           const title = await getHeadingTitle(ref.headingId);
           titles.set(ref.headingId, title);
+          
+          // Fetch citation text from ebook content
+          try {
+            const paragraphId = createParagraphId(ref.headingId, ref.pIndex);
+            const response = await fetch('/data/ebook_chapter_chap_4b6b984589dd283e.html');
+            if (response.ok) {
+              const htmlText = await response.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(htmlText, 'text/html');
+              const targetElement = doc.querySelector(`#${paragraphId}`);
+              if (targetElement) {
+                const citationText = targetElement.textContent?.trim().substring(0, 200) + '...';
+                citations.set(paragraphId, citationText || '');
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching citation text:', error);
+          }
         }
+        
         setReferenceTitles(titles);
+        setCitationTexts(citations);
       };
-      loadTitles();
+      loadTitlesAndCitations();
     }
   }, [backendResponse]);
 
@@ -247,6 +270,42 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
 
       {backendResponse && !isLoading && (
         <div className="p-4 border-t border-slate-600 bg-slate-700/50">
+          {/* Show citations for all intents that have references */}
+          {backendResponse.references && backendResponse.references.length > 0 && (
+            <div className="mb-4">
+              <p className="text-sm text-yellow-400 mb-2">📚 Trích dẫn từ giáo trình:</p>
+              <div className="space-y-2">
+                {backendResponse.references.map((ref, index) => {
+                  const paragraphId = createParagraphId(ref.headingId, ref.pIndex);
+                  const citationText = citationTexts.get(paragraphId);
+                  const refTitle = referenceTitles.get(ref.headingId) || ref.label;
+                  
+                  return (
+                    <div key={index} className="bg-red-900 text-yellow-100 p-3 rounded border-l-4 border-yellow-400">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-semibold text-yellow-400 text-sm">Từ {refTitle}:</span>
+                        <button
+                          onClick={() => {
+                            if (onNavigateToHTMLParagraph) {
+                              onNavigateToHTMLParagraph(paragraphId);
+                            }
+                          }}
+                          className="text-xs text-yellow-300 hover:text-yellow-100 underline"
+                        >
+                          Xem trong ebook →
+                        </button>
+                      </div>
+                      {citationText && (
+                        <p className="text-sm italic">&ldquo;{citationText}&rdquo;</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          
+          {/* Intent-specific sections */}
           {backendResponse.intent === 'PROJECT_META_QA' && (
             <div>
               <p className="text-sm text-yellow-400 mb-2">Dự án Meta QA:</p>
@@ -393,39 +452,44 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
       )}
 
       <div className="p-4 border-t border-slate-600">
-  <p className="text-sm text-yellow-400 mb-2">Ví dụ câu hỏi:</p>
-        <div className="grid grid-cols-1 gap-2 mb-4">
-          <button
-            onClick={() => setUserQuery("Hai xu hướng khách quan…")}
-            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-all duration-200 hover:scale-105 text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
-          >
-            Hai xu hướng khách quan…
-          </button>
-          <button
-            onClick={() => setUserQuery("Mở mục 6.2.1 trong ebook")}
-            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
-          >
-            Mở mục 6.2.1 trong ebook
-          </button>
-          <button
-            onClick={() => setUserQuery("Ai phụ trách Frontend?")}
-            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
-          >
-            Ai phụ trách Frontend?
-          </button>
-          <button
-            onClick={() => setUserQuery("Hoàng Sa Trường Sa là của ai?")}
-            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
-          >
-            Hoàng Sa Trường Sa là của ai?
-          </button>
-          <button
-            onClick={() => setUserQuery("giải thích giúp?")}
-            className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
-          >
-            giải thích giúp?
-          </button>
-        </div>
+        {/* Only show example questions if no chat history */}
+        {chatHistory.length === 0 && (
+          <>
+            <p className="text-sm text-yellow-400 mb-2">Ví dụ câu hỏi:</p>
+            <div className="grid grid-cols-1 gap-2 mb-4">
+              <button
+                onClick={() => setUserQuery("Hai xu hướng khách quan…")}
+                className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-all duration-200 hover:scale-105 text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
+              >
+                Hai xu hướng khách quan…
+              </button>
+              <button
+                onClick={() => setUserQuery("Mở mục 6.2.1 trong ebook")}
+                className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
+              >
+                Mở mục 6.2.1 trong ebook
+              </button>
+              <button
+                onClick={() => setUserQuery("Ai phụ trách Frontend?")}
+                className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
+              >
+                Ai phụ trách Frontend?
+              </button>
+              <button
+                onClick={() => setUserQuery("Hoàng Sa Trường Sa là của ai?")}
+                className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
+              >
+                Hoàng Sa Trường Sa là của ai?
+              </button>
+              <button
+                onClick={() => setUserQuery("giải thích giúp?")}
+                className="text-left p-2 bg-red-700 rounded hover:bg-yellow-400 transition-colors text-yellow-100 hover:text-red-900 text-sm border border-yellow-400"
+              >
+                giải thích giúp?
+              </button>
+            </div>
+          </>
+        )}
         <form onSubmit={handleFollowUpSubmit}>
           <input
             type="text"
