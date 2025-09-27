@@ -171,7 +171,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
 
   return (
     <div
-  className={`fixed top-0 right-0 h-full w-full md:w-1/3 xl:w-1/4 bg-gradient-to-br from-red-900 via-red-800 to-yellow-800 border-l-4 border-yellow-400 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+  className={`fixed top-0 right-0 h-full w-full md:w-1/2 xl:w-2/5 bg-gradient-to-br from-red-900 via-red-800 to-yellow-800 border-l-4 border-yellow-400 shadow-2xl transform transition-transform duration-300 ease-in-out ${
         isVisible
           ? "translate-x-0"
           : "translate-x-full pointer-events-none opacity-0"
@@ -205,7 +205,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
               }`}
             >
                 <div
-                  className={`max-w-xs md:max-w-sm rounded-lg px-4 py-2 ${
+                  className={`max-w-md md:max-w-lg rounded-lg px-4 py-2 ${
                     msg.sender === "user"
                       ? "bg-red-700/90 text-yellow-100 border border-yellow-400"
                       : "bg-yellow-100 text-red-900 border border-yellow-400"
@@ -246,7 +246,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-xs md:max-w-sm rounded-lg px-4 py-2 bg-yellow-100 text-red-900 border border-yellow-400 flex items-start gap-2">
+              <div className="max-w-md md:max-w-lg rounded-lg px-4 py-2 bg-yellow-100 text-red-900 border border-yellow-400 flex items-start gap-2">
                 <SparklesIcon className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
