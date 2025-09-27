@@ -30,6 +30,10 @@ export interface TermExplanation {
 export interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
+  followUps?: Array<{
+    label: string;
+    question: string;
+  }>;
 }
 
 export interface TextbookParagraph {

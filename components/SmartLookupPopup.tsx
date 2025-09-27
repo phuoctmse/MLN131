@@ -47,9 +47,14 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
               text: result.content,
             };
             setChatHistory((prev) => [...prev, newAiMessage]);
-            // Optionally, show follow-ups as buttons
+            // Show follow-ups as buttons if available
             if (result.follow_ups && result.follow_ups.length > 0) {
-              // Handle follow-ups later in render
+              const followUpMessage: ChatMessage = {
+                sender: "ai",
+                text: "📋 Câu hỏi gợi ý:",
+                followUps: result.follow_ups
+              };
+              setChatHistory((prev) => [...prev, followUpMessage]);
             }
           } else {
             setError("Không tìm thấy thông tin cho câu hỏi này.");
@@ -191,7 +196,26 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
                   ) : (
                     <>
                       <SparklesIcon className="w-4 h-4 mt-0.5 text-yellow-400 flex-shrink-0" />
-                      <p className="text-sm leading-relaxed flex-grow whitespace-pre-line">{msg.text}</p>
+                      <div className="flex-grow">
+                        <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
+                        {msg.followUps && msg.followUps.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            {msg.followUps.map((followUp, followIndex) => (
+                              <button
+                                key={followIndex}
+                                onClick={() => {
+                                  const newHumanMessage: ChatMessage = { sender: "user", text: followUp.question };
+                                  setChatHistory((prev) => [...prev, newHumanMessage]);
+                                  fetchExplanation("", followUp.question);
+                                }}
+                                className="block w-full text-left p-2 bg-yellow-300/80 rounded hover:bg-red-600 transition-colors text-red-900 hover:text-yellow-100 text-sm border border-yellow-500"
+                              >
+                                {followUp.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
