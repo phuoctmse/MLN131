@@ -1,11 +1,9 @@
 import { EbookParagraph, EbookChunk, EbookTOC, SearchIndex } from '../types';
 
-// Import JSON files as modules
-import ebookTOC from '../data/ebook_toc.json';
-
 class EbookService {
   private static instance: EbookService;
   private searchIndex: SearchIndex | null = null;
+  private ebookTOC: EbookTOC | null = null;
 
   private constructor() {}
 
@@ -47,8 +45,22 @@ class EbookService {
   }
 
   // Get table of contents
-  getTOC(): EbookTOC {
-    return ebookTOC as EbookTOC;
+  async getTOC(): Promise<EbookTOC> {
+    if (this.ebookTOC) {
+      return this.ebookTOC;
+    }
+    
+    try {
+      const response = await fetch('/ebook_toc.json');
+      if (!response.ok) {
+        throw new Error('Failed to load ebook TOC');
+      }
+      this.ebookTOC = await response.json();
+      return this.ebookTOC as EbookTOC;
+    } catch (error) {
+      console.error('Error loading ebook TOC:', error);
+      throw error;
+    }
   }
 
   // Build search index for fast lookups
@@ -59,7 +71,7 @@ class EbookService {
 
     const paragraphs = await this.loadParagraphs();
     const chunks = await this.loadChunks();
-    const toc = this.getTOC();
+    const toc = await this.getTOC();
 
     const searchIndex: SearchIndex = {
       paragraphs: new Map(),

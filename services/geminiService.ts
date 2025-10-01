@@ -136,7 +136,7 @@ const loadEbookTOC = async (): Promise<EbookTOC> => {
   if (ebookTOC) return ebookTOC;
   
   try {
-    const response = await fetch('/data/ebook_toc.json');
+    const response = await fetch('/ebook_toc.json');
     ebookTOC = await response.json();
     return ebookTOC;
   } catch (error) {
@@ -165,7 +165,7 @@ export const createParagraphId = (headingId: string, pIndex: number): string => 
 // Load content from the specific chapter file
 const loadChapterContent = async (): Promise<string> => {
   try {
-    const response = await fetch('/data/ebook_chapter_chap_4b6b984589dd283e.html');
+    const response = await fetch('/ebook_chapter_chap_4b6b984589dd283e.html');
     const htmlContent = await response.text();
     
     // Extract text content from HTML

@@ -226,7 +226,7 @@ class EbookAIService {
    * Get chapter and heading structure for navigation
    */
   async getBookStructure() {
-    const toc = this.ebookService.getTOC();
+    const toc = await this.ebookService.getTOC();
     const index = await this.ebookService.buildSearchIndex();
     
     return {

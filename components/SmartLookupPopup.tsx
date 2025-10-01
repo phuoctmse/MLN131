@@ -136,7 +136,7 @@ const SmartLookupPopup: React.FC<SmartLookupPopupProps> = ({
           // Fetch citation text from ebook content
           try {
             const paragraphId = createParagraphId(ref.headingId, ref.pIndex);
-            const response = await fetch('/data/ebook_chapter_chap_4b6b984589dd283e.html');
+            const response = await fetch('/ebook_chapter_chap_4b6b984589dd283e.html');
             if (response.ok) {
               const htmlText = await response.text();
               const parser = new DOMParser();
