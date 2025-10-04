@@ -11,10 +11,22 @@ interface PresentationViewProps {
   onNavigateToEbook: (citation: Citation) => void;
   onNavigateToPDF: (paragraphId?: string) => void;
   onOpenChat: (term?: string) => void;
+  onShowRoadmap?: () => void;
+  onShowIntro?: () => void;
+  initialSlideId?: number;
+  onSlideChange?: (slideId: number) => void;
 }
 
-const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, onNavigateToPDF, onOpenChat }) => {
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+const PresentationView: React.FC<PresentationViewProps> = ({ 
+  onNavigateToEbook, 
+  onNavigateToPDF, 
+  onOpenChat,
+  onShowRoadmap,
+  onShowIntro,
+  initialSlideId = 1,
+  onSlideChange
+}) => {
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(Math.max(0, (initialSlideId || 1) - 1));
   const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
 
   const totalSlides = slides.length;
@@ -26,6 +38,13 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
   const goToPrevSlide = useCallback(() => {
     setCurrentSlideIndex((prevIndex) => (prevIndex - 1 + totalSlides) % totalSlides);
   }, [totalSlides]);
+
+  // Inform parent when slide changes so roadmap highlighting stays in sync
+  React.useEffect(() => {
+    if (typeof onSlideChange === 'function') {
+      onSlideChange(currentSlideIndex + 1);
+    }
+  }, [currentSlideIndex, onSlideChange]);
 
   useKeyPress('ArrowRight', goToNextSlide);
   useKeyPress('ArrowLeft', goToPrevSlide);
@@ -46,9 +65,9 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
   }, [onOpenChat]);
 
   return (
-  <div className="relative w-full h-full flex flex-col items-center justify-center p-4 md:p-8 pt-20 overflow-hidden bg-gradient-to-br from-red-900 via-red-800 to-yellow-800">
+  <div className="relative w-full h-screen flex flex-col items-center justify-center pt-16 overflow-hidden bg-gradient-to-br from-red-900 via-red-800 to-yellow-800">
       {/* Nav with logo/slogan */}
-  <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-2 bg-red-800/90 border-b-2 border-yellow-400 shadow-lg">
+  <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-red-800/90 border-b-2 border-yellow-400 shadow-lg">
         <div className="flex items-center gap-2">
           {/* Simple Dong Son drum SVG icon */}
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +77,52 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
           </svg>
           <span className="ml-2 text-lg md:text-2xl font-bold text-yellow-300 drop-shadow">Tự hào dân tộc Việt Nam</span>
         </div>
-        <div className="hidden md:block text-yellow-200 font-semibold text-base">Đoàn kết – Đa dạng – Một Việt Nam</div>
+        
+        {/* Center slogan */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block text-yellow-200 font-semibold text-base">
+          Đoàn kết – Đa dạng – Một Việt Nam
+        </div>
+        
+        {/* Navigation links */}
+        <nav className="flex items-center gap-6">
+          {onShowIntro && (
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                onShowIntro();
+              }}
+              className="text-yellow-300 hover:text-yellow-100 transition-colors duration-300 font-semibold text-base border-b-2 border-transparent hover:border-yellow-300 pb-1"
+            >
+              Giới thiệu
+            </a>
+          )}
+          
+          {onShowRoadmap && (
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                onShowRoadmap();
+              }}
+              className="text-yellow-300 hover:text-yellow-100 transition-colors duration-300 font-semibold text-base border-b-2 border-transparent hover:border-yellow-300 pb-1"
+            >
+              Bản đồ
+            </a>
+          )}
+          
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigateToPDF();
+            }}
+            className="text-yellow-300 hover:text-yellow-100 transition-colors duration-300 font-semibold text-base border-b-2 border-transparent hover:border-yellow-300 pb-1"
+          >
+            Giáo trình
+          </a>
+          
+        </nav>
       </div>
       <div className="absolute top-0 left-0 right-0 z-30 h-1 bg-yellow-300/60">
         <div
@@ -82,7 +146,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Main slide */}
           {slides.map((slide, index) => (
-              <div key={slide.id} className={`absolute inset-0 transition-all duration-700 ease-in-out ${index === currentSlideIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}>
+              <div key={slide.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${index === currentSlideIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}>
                   {index === currentSlideIndex && (
                     <>
                       <Slide slide={slide} onSelectTerm={handleSelectTerm} />
@@ -91,14 +155,7 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
                   )}
               </div>
           ))}
-          {/* Next slide preview on the right */}
-          {slides.length > 1 && (
-            <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1/2 h-4/5 flex items-center justify-end pointer-events-none select-none">
-              <div className="w-full h-full flex items-center justify-center opacity-40 scale-90 blur-sm transition-all duration-700">
-                <Slide slide={slides[(currentSlideIndex + 1) % slides.length]} onSelectTerm={() => {}} />
-              </div>
-            </div>
-          )}
+          {/* Next slide preview removed for cleaner full-width layout */}
         </div>
       </div>
 
@@ -149,18 +206,6 @@ const PresentationView: React.FC<PresentationViewProps> = ({ onNavigateToEbook, 
         </div>
         <span className="text-sm">{currentSlideIndex + 1} / {totalSlides}</span>
       </div>
-
-      {/* PDF Button */}
-      <button
-        onClick={() => onNavigateToPDF()}
-        className="fixed top-20 right-6 z-40 bg-yellow-400 hover:bg-yellow-500 text-red-900 rounded-full shadow-lg p-4 flex items-center gap-2 transition-all duration-300 hover:scale-110 font-bold border-2 border-red-700"
-        title="Xem giáo trình"
-      >
-        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-        </svg>
-        <span className="hidden md:inline font-semibold">Giáo trình</span>
-      </button>
 
       {/* Chat popup is now global in App */}
     </div>

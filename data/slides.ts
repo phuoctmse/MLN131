@@ -2,6 +2,7 @@ export const slides = [
   {
     id: 1,
     title: 'GIỚI THIỆU VẤN ĐỀ DÂN TỘC',
+    image: '/images/dantoc_vietnam.jpg', // Thêm đường dẫn ảnh
     content: [
       {
         text: 'Khái niệm và đặc trưng cơ bản của dân tộc:',
@@ -26,6 +27,7 @@ export const slides = [
   {
     id: 2,
     title: 'ĐẶC ĐIỂM DÂN TỘC Ở VIỆT NAM',
+    image: '/images/54-dan-toc-viet-nam.jpg', // Thêm đường dẫn ảnh
     content: [
       {
         text: 'Đặc điểm nổi bật:',
